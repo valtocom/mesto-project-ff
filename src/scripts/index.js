@@ -1,6 +1,7 @@
 import '../pages/index.css';
-import { createCard } from './card';
-import {openPopap, closePopap, closeButtonPopup} from './modal';
+import { initialCards } from './cards.js';
+import { createCard, removeCard, handleLike } from './card';
+import {openPopup, closePopup, initPopupCloseByClick} from './modal';
 
 
 const editButton = document.querySelector('.profile__edit-button');
@@ -8,6 +9,8 @@ const editPopup = document.querySelector('.popup_type_edit');
 const formProfile = editPopup.querySelector('.popup__form');
 const nameInput = formProfile.querySelector('.popup__input_type_name');
 const jobInput = formProfile.querySelector('.popup__input_type_description');
+const profileTitle = document.querySelector('.profile__title');
+const profileDescription = document.querySelector('.profile__description');
 
 const placesList = document.querySelector('.places__list');
 
@@ -23,24 +26,21 @@ const imageCaption = imagePopap.querySelector('.popup__caption');
 
 
 editButton.addEventListener('click', () => {
-    openPopap(editPopup);
+    jobInput.value = profileTitle.textContent;
+    nameInput.value = profileDescription.textContent;
+    openPopup(editPopup);
 });
 
 addButton.addEventListener('click', () => {
-    openPopap(cardPopup);
+    openPopup(cardPopup);
 });
 
 
 const handleProfileFormSubmit = (evt) => {
     evt.preventDefault();
-
-    const profileTitle = document.querySelector('.profile__title');
-    const profileDescription = document.querySelector('.profile__description');
-
     profileTitle.textContent = jobInput.value;
     profileDescription.textContent = nameInput.value;
-
-    closePopap(editPopup);
+    closePopup(editPopup);
 }
 
 formProfile.addEventListener('submit', handleProfileFormSubmit);
@@ -58,7 +58,7 @@ const handleCardFormSubmit = (evt) => {
       )
     );
 
-    closePopap(cardPopup);
+    closePopup(cardPopup);
     formCard.reset();
   };
 
@@ -69,10 +69,15 @@ export const handleOpenImage = ({ name, link }) => {
     imageElement.src = link;
     imageElement.alt = name;
     imageCaption.textContent = name;
-    openPopap(imagePopap);
+    openPopup(imagePopap);
   };
 
 
-closeButtonPopup(editPopup);
-closeButtonPopup(cardPopup);
-closeButtonPopup(imagePopap);
+initialCards.forEach((card) => placesList.append(
+  createCard(card, removeCard, handleLike, handleOpenImage)
+));
+
+
+initPopupCloseByClick(editPopup);
+initPopupCloseByClick(cardPopup);
+initPopupCloseByClick(imagePopap);
