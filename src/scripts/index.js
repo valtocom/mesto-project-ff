@@ -45,7 +45,65 @@ const validationConfig = {
   errorClass: 'popup__error_visible',
 }
 
-enableValidation(validationConfig)
+const promises = [getInitialCards(), getUserProfile()]
+
+const handleAvatarFormSubmit = (evt) => {
+  evt.preventDefault()
+  const link = avatarInput.value
+  updateUserAvatar(link)
+    .then((res) => {
+      profileImage.src = res.avatar
+      closePopup(avatarPopup)
+    })
+    .catch((err) => console.log(err))
+}
+
+const handleProfileFormSubmit = (evt) => {
+  evt.preventDefault()
+  const name = nameInput.value
+  const about = jobInput.value
+  updateUserProfile(name, about)
+    .then((res) => {
+      profileTitle.textContent = res.name
+      profileDescription.textContent = res.about
+      closePopup(editPopup)
+    })
+    .catch((err) => console.log(err))
+}
+
+const handleCardFormSubmit = (evt) => {
+  evt.preventDefault()
+
+  const name = cardNameInput.value
+  const link = cardUrlInput.value
+
+  addNewCard(name, link)
+    .then((res) => {
+      placesList.prepend(
+        createCard(
+          res,
+          res.owner._id,
+          (evt) => {
+            removeCard(evt, res._id)
+          },
+          (evt) => {
+            handleLike(evt, res._id)
+          },
+          handleOpenImage,
+        ),
+      )
+      closePopup(cardPopup)
+      formCard.reset()
+    })
+    .catch((err) => console.log(err))
+}
+
+export const handleOpenImage = ({ name, link }) => {
+  imageElement.src = link
+  imageElement.alt = name
+  imageCaption.textContent = name
+  openPopup(imagePopap)
+}
 
 editButton.addEventListener('click', () => {
   nameInput.value = profileTitle.textContent
@@ -66,60 +124,9 @@ profileAvatar.addEventListener('click', () => {
   openPopup(avatarPopup)
 })
 
-const handleAvatarFormSubmit = (evt) => {
-  evt.preventDefault()
-  const link = avatarInput.value
-  updateUserAvatar(link)
-    .then((res) => {
-      profileImage.src = res.avatar
-      closePopup(avatarPopup)
-    })
-    .catch((err) => console.log(err))
-}
-
 formAvatar.addEventListener('submit', handleAvatarFormSubmit)
-
-const handleProfileFormSubmit = (evt) => {
-  evt.preventDefault()
-  const name = nameInput.value
-  const about = jobInput.value
-  updateUserProfile(name, about)
-    .then((res) => {
-      profileTitle.textContent = res.name
-      profileDescription.textContent = res.about
-      closePopup(editPopup)
-    })
-    .catch((err) => console.log(err))
-}
-
 formProfile.addEventListener('submit', handleProfileFormSubmit)
-
-const handleCardFormSubmit = (evt) => {
-  evt.preventDefault()
-
-  const name = cardNameInput.value
-  const link = cardUrlInput.value
-
-  addNewCard(name, link)
-    .then((res) => {
-      placesList.prepend(createCard({ res }))
-    })
-    .catch((err) => console.log(err))
-
-  closePopup(cardPopup)
-  formCard.reset()
-}
-
 formCard.addEventListener('submit', handleCardFormSubmit)
-
-export const handleOpenImage = ({ name, link }) => {
-  imageElement.src = link
-  imageElement.alt = name
-  imageCaption.textContent = name
-  openPopup(imagePopap)
-}
-
-const promises = [getInitialCards(), getUserProfile()]
 
 Promise.all(promises)
   .then((res) => {
@@ -128,7 +135,6 @@ Promise.all(promises)
     profileImage.src = res[1].avatar
 
     res[0].forEach((item) => {
-      item.isOwner = res[1]._id === item.owner._id
       item.isLiked = item.likes.some((like) => like._id === res[1]._id)
     })
 
@@ -136,6 +142,7 @@ Promise.all(promises)
       placesList.append(
         createCard(
           card,
+          res[1]._id,
           (evt) => {
             removeCard(evt, card._id)
           },
@@ -153,3 +160,5 @@ initPopupCloseByClick(editPopup)
 initPopupCloseByClick(cardPopup)
 initPopupCloseByClick(imagePopap)
 initPopupCloseByClick(avatarPopup)
+
+enableValidation(validationConfig)
