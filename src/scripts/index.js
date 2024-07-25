@@ -17,6 +17,7 @@ const nameInput = formProfile.querySelector('.popup__input_type_name')
 const jobInput = formProfile.querySelector('.popup__input_type_description')
 const profileTitle = document.querySelector('.profile__title')
 const profileDescription = document.querySelector('.profile__description')
+const profileButtonSave = editPopup.querySelector('.popup__button')
 
 const placesList = document.querySelector('.places__list')
 
@@ -25,6 +26,7 @@ const cardPopup = document.querySelector('.popup_type_new-card')
 const formCard = cardPopup.querySelector('.popup__form')
 const cardNameInput = formCard.querySelector('.popup__input_type_card-name')
 const cardUrlInput = formCard.querySelector('.popup__input_type_url')
+const cardButtonSave = cardPopup.querySelector('.popup__button')
 
 const imagePopap = document.querySelector('.popup_type_image')
 const imageElement = imagePopap.querySelector('.popup__image')
@@ -35,6 +37,7 @@ const profileImage = profileAvatar.querySelector('.profile__image-avatar')
 const avatarPopup = document.querySelector('.popup_type_avatar')
 const formAvatar = avatarPopup.querySelector('.popup__form')
 const avatarInput = formAvatar.querySelector('.popup__input_avatar')
+const avatarButtonSave = avatarPopup.querySelector('.popup__button')
 
 const validationConfig = {
   formSelector: '.popup__form',
@@ -49,6 +52,7 @@ const promises = [getInitialCards(), getUserProfile()]
 
 const handleAvatarFormSubmit = (evt) => {
   evt.preventDefault()
+  avatarButtonSave.textContent = 'Сохранение...'
   const link = avatarInput.value
   updateUserAvatar(link)
     .then((res) => {
@@ -56,10 +60,12 @@ const handleAvatarFormSubmit = (evt) => {
       closePopup(avatarPopup)
     })
     .catch((err) => console.log(err))
+    .finally(() => (avatarButtonSave.textContent = 'Сохранить'))
 }
 
 const handleProfileFormSubmit = (evt) => {
   evt.preventDefault()
+  profileButtonSave.textContent = 'Сохранение...'
   const name = nameInput.value
   const about = jobInput.value
   updateUserProfile(name, about)
@@ -69,11 +75,12 @@ const handleProfileFormSubmit = (evt) => {
       closePopup(editPopup)
     })
     .catch((err) => console.log(err))
+    .finally(() => (profileButtonSave.textContent = 'Сохранить'))
 }
 
 const handleCardFormSubmit = (evt) => {
   evt.preventDefault()
-
+  cardButtonSave.textContent = 'Сохранение...'
   const name = cardNameInput.value
   const link = cardUrlInput.value
 
@@ -96,6 +103,7 @@ const handleCardFormSubmit = (evt) => {
       formCard.reset()
     })
     .catch((err) => console.log(err))
+    .finally(() => (cardButtonSave.textContent = 'Сохранить'))
 }
 
 export const handleOpenImage = ({ name, link }) => {
